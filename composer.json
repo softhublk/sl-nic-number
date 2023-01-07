@@ -1,0 +1,49 @@
+{
+    "name": "softhublk/sl-nic-number",
+    "type": "library",
+    "description": "Simple package to validate Sri Lankan NIC number",
+    "keywords": [
+        "softhublk",
+        "sl-nic-number"
+    ],
+    "homepage": "https://github.com/softhublk/sl-nic-number",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nimna Avantha",
+            "email": "avantha.nimna@gmail.com",
+            "homepage": "awantha.me",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : "~7.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : ">=8.0",
+        "squizlabs/php_codesniffer": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Softhub\\SlNicNumber\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Softhub\\SlNicNumber\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "check-style": "phpcs src tests",
+        "fix-style": "phpcbf src tests"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
