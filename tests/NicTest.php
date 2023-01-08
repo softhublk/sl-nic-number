@@ -16,6 +16,14 @@ class NicTest extends \PHPUnit\Framework\TestCase
     }
 
 
+    /**
+     * @dataProvider validNic
+     */
+    public function test_nic_old_or_new(string $nicNumber, string $type)
+    {
+        $nic  = new Nic($nicNumber);
+        $this->assertEquals($type, $nic->getType());
+    }
     public function validityNicNumbers()
     {
         return [
@@ -27,6 +35,15 @@ class NicTest extends \PHPUnit\Framework\TestCase
             ['v123456789', false],
             ['123456789', false],
             ['12 34567 89v',false],
+        ];
+    }
+
+    public function validNic()
+    {
+        return[
+            ['123456789v', Nic::OLD_NIC],
+            ['123456789V', Nic::OLD_NIC],
+            ['19991234578', Nic::NEW_NIC],
         ];
     }
 
