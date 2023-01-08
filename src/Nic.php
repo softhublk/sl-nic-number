@@ -8,7 +8,7 @@ class Nic
     public const OLD_NIC = "Old Nic";
     public const NEW_NIC = "New Nic";
 
-    private string $nic;
+    public string $nic;
     public bool $isValid;
 
     public string $type;
@@ -40,8 +40,14 @@ class Nic
     {
         if (strlen($this->nic) == 10) {
             $this->type = Nic::OLD_NIC;
+            $this->convertNewFormat();
         } else {
             $this->type =  Nic::NEW_NIC;
         }
+    }
+
+    public function convertNewFormat(): void
+    {
+        $this->nic = "19". substr($this->nic, 0, 5) . "0" . substr($this->nic, 5, 4);
     }
 }
