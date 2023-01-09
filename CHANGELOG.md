@@ -1,22 +1,13 @@
 # Changelog
 
-All notable changes to `sl-nic-number` will be documented in this file.
-
-Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
-
-## NEXT - YYYY-MM-DD
+## 1.1 - 2023-01-D9
 
 ### Added
-- Nothing
+- Support php 7.2 or higher version
 
-### Deprecated
-- Nothing
 
-### Fixed
-- Nothing
-
-### Removed
-- Nothing
-
-### Security
-- Nothing
+## 1.0 - 2023-01-08
+### Added
+- Can valid Sri Lankan NIC Number
+- Get gender owner of nic
+- get date of birth of the nic owner
