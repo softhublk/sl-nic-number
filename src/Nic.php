@@ -34,7 +34,7 @@ class Nic
 
     public function validate(): bool
     {
-        $paten = "/[0-9]{9}[vV]|[0-9]12/";
+        $paten = "/[0-9]{9}[vV]|[0-9]{12}/";
         return preg_match($paten, $this->nic);
     }
 

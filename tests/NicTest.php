@@ -57,7 +57,7 @@ class NicTest extends \PHPUnit\Framework\TestCase
         return [
             ['123456789v', true],
             ['123456789V', true],
-            ['19991234578', true],
+            ['198435201817',true],
             ['123456789y', false],
             ['1234v56789', false],
             ['v123456789', false],
