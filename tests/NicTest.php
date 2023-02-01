@@ -4,101 +4,104 @@ declare(strict_types=1);
 
 namespace Softhub\SlNicNumber;
 
-class NicTest extends \PHPUnit\Framework\TestCase
+use DateTimeImmutable;
+use PHPUnit\Framework\TestCase;
+use Softhub\SlNicNumber\Enums\Category;
+use Softhub\SlNicNumber\Enums\Gender;
+use Softhub\SlNicNumber\Exceptions\InvalidNicException;
+
+class NicTest extends TestCase
 {
     /**
-     * @dataProvider validityNicNumbers
+     * @dataProvider validNicNumbersProvider
      */
-    public function test_nic_validate_by_regular_expression(string $nicnumber, bool $validity)
+    public function test_can_crete_an_instance_with_a_valid_nic($nic)
     {
-        $nic = new Nic($nicnumber);
-        $this->assertEquals($validity, $nic->isValid);
+        $this->assertInstanceOf(Nic::class, Nic::from($nic));
     }
 
-
-    /**
-     * @dataProvider validNic
-     */
-    public function test_nic_old_or_new(string $nicNumber, string $type)
+    public function validNicNumbersProvider(): array
     {
-        $nic  = new Nic($nicNumber);
-        $this->assertEquals($type, $nic->getType());
+        return [
+            'old format' => ['123456789v'],
+            'new format' => ['199912345782'],
+        ];
     }
 
     /**
-     * @dataProvider toConvertNewFormat
+     * @dataProvider invalidNicNumbersProvider
      */
-    public function test_convert_old_to_new_format(string $nicNumber, string $newNumber)
+    public function test_it_validate_nic($nic)
     {
-        $nic = new Nic($nicNumber);
-        $this->assertEquals($newNumber, $nic->nic);
+        $this->expectException(InvalidNicException::class);
+
+        new Nic($nic);
+    }
+
+    public function invalidNicNumbersProvider(): array
+    {
+        return [
+            'short' => ['123456789'],
+            'long' => ['123456789646464'],
+            'with white space' => ['12 34567 89v'],
+        ];
     }
 
     /**
-     * @dataProvider validateGender
+     * @dataProvider nicWithCategoryProvider
      */
-    public function test_check_gender_nic_owner(string $nicNumber, ?string $gender)
+    public function test_can_get_the_category(string $nicNumber, Category $category)
     {
-        $nic = new Nic($nicNumber);
+        $nic  = Nic::from($nicNumber);
+        $this->assertEquals($category, $nic->getCategory());
+    }
+
+    public function nicWithCategoryProvider(): array
+    {
+        return[
+            'old format' => ['123456789V', Category::Old],
+            'new format' => ['199912345783', Category::New],
+        ];
+    }
+
+    /**
+     * @dataProvider nicWithGenderProvider
+     */
+    public function test_can_get_the_gender(string $nicNumber, Gender $gender)
+    {
+        $nic = Nic::from($nicNumber);
         $this->assertEquals($gender, $nic->getGender());
     }
 
+    public function nicWithGenderProvider(): array
+    {
+        return[
+            'female old format' => ['996261000v', Gender::Female],
+            'female new format' => ['199962345784', Gender::Female],
+            'male old format' => ['123456789v', Gender::Male],
+            'male new format' => ['199912345784', Gender::Male],
+        ];
+    }
+
     /**
-     * @dataProvider validateBirthday
+     * @dataProvider nicWithDobDetailsProvider
      */
-    public function test_validate_date_of_bith(string $nicNumber, string $dateOfBirth)
+    public function test_can_get_the_date_of_birth(string $nicNumber, string $dateOfBirth)
     {
-        $nic = new Nic($nicNumber);
-        $this->assertEquals($dateOfBirth, $nic->getBirthDay());
+        $nic = Nic::from($nicNumber);
+        $dob = $nic->getDateOfBirth();
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $dob);
+        $this->assertEquals($dateOfBirth, $dob->format('Y-m-d'));
     }
 
-    public function validityNicNumbers()
-    {
-        return [
-            ['123456789v', true],
-            ['123456789V', true],
-            ['19991234578', true],
-            ['123456789y', false],
-            ['1234v56789', false],
-            ['v123456789', false],
-            ['123456789', false],
-            ['12 34567 89v',false],
-        ];
-    }
-
-    public function validNic()
+    public function nicWithDobDetailsProvider(): array
     {
         return[
-            ['123456789v', Nic::OLD_NIC],
-            ['123456789V', Nic::OLD_NIC],
-            ['19991234578', Nic::NEW_NIC],
-        ];
-    }
-
-    public function toConvertNewFormat()
-    {
-        return[
-            ['123456789v', "191234506789"],
-            ['123456789V', "191234506789"],
-            ['993261000v', '199932601000']
-        ];
-    }
-
-    public function validateGender()
-    {
-        return[
-            ['123456789v', Nic::MALE],
-            ['996261000v', Nic::FEMALE],
-            ['123456789v', Nic::MALE],
-            ['994260000v', null]
-        ];
-    }
-
-    public function validateBirthday()
-    {
-        return[
-            ['123456789v', "1912-December-10"],
-            ['998261000v', '1999-November-21'],
+            ['890213529v', '1989-01-21'],
+            ['198902130529', '1989-01-21'],
+            ['918383794v', '1991-12-03'],
+            ['199183830794', '1991-12-03'],
         ];
     }
 }
