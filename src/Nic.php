@@ -2,123 +2,92 @@
 
 namespace Softhub\SlNicNumber;
 
-use DateInterval;
 use DateTime;
+use DateTimeImmutable;
+use Softhub\SlNicNumber\Enums\Category;
+use Softhub\SlNicNumber\Enums\Gender;
+use Softhub\SlNicNumber\Exceptions\InvalidNicException;
 
 class Nic
 {
+    const FEMALE_DOB_LEAD = 500;
 
-    public const OLD_NIC = "Old Nic";
-    public const NEW_NIC = "New Nic";
-    public const MALE = "Male";
-    public const FEMALE = "Female";
+    private string $nic;
+    private Category $category;
+    private ?DateTimeImmutable $birthDay = null;
 
-    public string $nic;
-    public bool $isValid;
-
-    public string $type;
-
-    public ?string $birthDay = null;
-
-    private int $days;
-
-    public ?string $gender = null;
     public function __construct(string $nic)
     {
-        $this->nic = $nic;
-        $this->isValid = $this->validate();
-        $this->getData();
-        $this->checkGender();
-        $this->calculateDateOfBirth();
+        if ($this->validate($nic)) {
+            $this->setCategoryAndParseToNewFormat($nic);
+        }
     }
 
-    public function validate(): bool
+    public static function from(string $nic): Nic
     {
-        $paten = "/[0-9]{9}[vV]|[0-9]{12}/";
-        return preg_match($paten, $this->nic);
+
+return new Nic($nic);
     }
 
-
-    /**
-     * @return string
-     */
-    public function getType(): string
+    public function getCategory(): Category
     {
-        return $this->type;
+        return $this->category;
     }
 
-    /**
-     * @return string
-     */
-    public function getGender(): ?string
+    public function getGender(): Gender
     {
-        return $this->gender;
+        return $this->getBornDayOfTheYearSection() > self::FEMALE_DOB_LEAD ? Gender::Female : Gender::Male;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getBirthDay(): ?string
+    public function getBornDayOfTheYear(): int
     {
+        $section = $this->getBornDayOfTheYearSection();
+
+        return $this->isFemale() ? $section - (self::FEMALE_DOB_LEAD + 1) : $section;
+    }
+
+    public function getDateOfBirth(): DateTimeImmutable
+    {
+        if (is_null($this->birthDay)) {
+            $dob = DateTime::createFromFormat('Y-m-d', $this->getBornYear() . '-01-01');
+            $days = $this->getBornDayOfTheYear() - 1;
+            $dob->modify("+{$days} days");
+            $this->birthDay = DateTimeImmutable::createFromMutable($dob);
+        }
+
         return $this->birthDay;
     }
 
-
-    private function getData(): void
+    private function validate($nic): bool
     {
-        if (strlen($this->nic) == 10) {
-            $this->type = Nic::OLD_NIC;
-            $this->convertNewFormat();
-        } else {
-            $this->type =  Nic::NEW_NIC;
-        }
-    }
-
-    public function convertNewFormat(): void
-    {
-        $this->nic = "19". substr($this->nic, 0, 5) . "0" . substr($this->nic, 5, 4);
-    }
-
-    public function checkGender()
-    {
-        $this->days = (int) substr($this->nic, 4, 3);
-        if ($this->days  <= 366) {
-            $this->gender = Nic::MALE;
-        } elseif ($this->days  > 500 and $this->days <866) {
-            $this->gender = Nic::FEMALE;
-        } else {
-            $this->gender = null;
-            $this->isValid = false;
-        }
-    }
-
-    public function calculateDateOfBirth()
-    {
-        if ($this->isValid) {
-            if ($this->gender == Nic::MALE) {
-                list($month_name, $day) = $this->getMonthNameAndDay($this->days);
-            } else {
-                list($month_name, $day) = $this->getMonthNameAndDay($this->days-500);
-            }
-            $this->birthDay = substr($this->nic, 0, 4) . "-". $month_name . "-" . $day;
-        }
-    }
-
-    private function getMonthNameAndDay($num): array
-    {
-        $days_in_month = array(31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
-        $month = 1;
-        $day = $num;
-
-        while ($day > $days_in_month[$month - 1]) {
-            $day -= $days_in_month[$month - 1];
-            $month++;
+        if (preg_match('/^[0-9]{9}[vVxX]$|^[0-9]{12}$/', $nic)) {
+            return true;
         }
 
-        $date = new DateTime("first day of January");
-        $date->add(new DateInterval("P" . ($month - 1) . "M"));
-        $month_name = $date->format('F');
+        throw new InvalidNicException();
+    }
 
-        return array($month_name, $day);
+    private function getBornYear(): int
+    {
+        return (int) substr($this->nic, 0, 4);
+    }
+
+    private function getBornDayOfTheYearSection(): int
+    {
+        return (int) substr($this->nic, 4, 3);
+    }
+
+    private function setCategoryAndParseToNewFormat($nic): void
+    {
+        $this->category = strlen($nic) == 10 ? Category::Old : Category::New;
+
+        $this->nic = $this->getCategory() === Category::Old ?
+            "19". substr($nic, 0, 5) . "0" . substr($nic, 5, 4) :
+            $nic;
+    }
+
+    private function isFemale(): bool
+    {
+        return $this->getGender() === Gender::Female;
     }
 }
