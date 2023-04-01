@@ -25,7 +25,8 @@ class Nic
 
     public static function from(string $nic): Nic
     {
-        return new Nic($nic);
+
+return new Nic($nic);
     }
 
     public function getCategory(): Category
