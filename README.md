@@ -21,20 +21,20 @@ $ composer require softhublk/sl-nic-number
 
 ``` php
 <?php
-require  'vendor/autoload.php';
+
+require 'vendor/autoload.php';
 
 use Softhub\SlNicNumber\Nic;
 
-$nic = new Nic('991234567');
+$nic = new Nic('993261580v');
 
-if ($nic->isValid){                     //validate nic
-    echo ("valid nic <br>");
-    echo ("Nic Number : ". $nic->nic . "<br>");                  //convert 12 digit number automatically
-    echo ("Gender :" . $nic->getGender() . "<br>");              //get inc owner gender
-    echo ("Date Of birth : ". $nic->getBirthDay() . "<br>");     //get owner birthday
-}else{
-    echo "invalid Nic";
-}
+echo 'NIC Type' . $nic->getCategory()->value . '<br>';
+
+echo "Gender : {$nic->getGender()->value} <br>";
+
+echo "Date Of Birth : {$nic->getDateOfBirth()->format('Y-m-d')}<br>";
+
+echo 'Born day of the year ' . $nic->getBornDayOfTheYear() . '<br>';
 
 
 ```
@@ -60,6 +60,7 @@ If you discover any security related issues, please email avantha.nimna@gmail.co
 ## Credits
 
 - [Nimna Avantha][link-author]
+- [Milroy Fraser](https://github.com/milroyfraser)
 - [All Contributors][link-contributors]
 
 ## License
