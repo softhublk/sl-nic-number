@@ -26,7 +26,7 @@ require 'vendor/autoload.php';
 
 use Softhub\SlNicNumber\Nic;
 
-$nic = new Nic('993261580v');
+$nic = new Nic('991234567v');
 
 echo 'NIC Type' . $nic->getCategory()->value . '<br>';
 
@@ -61,7 +61,6 @@ If you discover any security related issues, please email avantha.nimna@gmail.co
 
 - [Nimna Avantha][link-author]
 - [Milroy Fraser](https://github.com/milroyfraser)
-
 - [All Contributors][link-contributors]
 
 ## License
