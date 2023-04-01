@@ -61,6 +61,7 @@ If you discover any security related issues, please email avantha.nimna@gmail.co
 
 - [Nimna Avantha][link-author]
 - [Milroy Fraser](https://github.com/milroyfraser)
+
 - [All Contributors][link-contributors]
 
 ## License
