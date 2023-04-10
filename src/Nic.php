@@ -25,8 +25,7 @@ class Nic
 
     public static function from(string $nic): Nic
     {
-
-return new Nic($nic);
+        return new Nic($nic);
     }
 
     public function getCategory(): Category
@@ -51,6 +50,9 @@ return new Nic($nic);
         if (is_null($this->birthDay)) {
             $dob = DateTime::createFromFormat('Y-m-d', $this->getBornYear() . '-01-01');
             $days = $this->getBornDayOfTheYear() - 1;
+            if ($this->getGender() === Gender::Male && $days > 59) {
+                $days-=1;
+            }
             $dob->modify("+{$days} days");
             $this->birthDay = DateTimeImmutable::createFromMutable($dob);
         }
@@ -69,12 +71,12 @@ return new Nic($nic);
 
     private function getBornYear(): int
     {
-        return (int) substr($this->nic, 0, 4);
+        return (int)substr($this->nic, 0, 4);
     }
 
     private function getBornDayOfTheYearSection(): int
     {
-        return (int) substr($this->nic, 4, 3);
+        return (int)substr($this->nic, 4, 3);
     }
 
     private function setCategoryAndParseToNewFormat($nic): void
@@ -82,7 +84,7 @@ return new Nic($nic);
         $this->category = strlen($nic) == 10 ? Category::Old : Category::New;
 
         $this->nic = $this->getCategory() === Category::Old ?
-            "19". substr($nic, 0, 5) . "0" . substr($nic, 5, 4) :
+            "19" . substr($nic, 0, 5) . "0" . substr($nic, 5, 4) :
             $nic;
     }
 
